@@ -3,6 +3,13 @@ package Algorithm;
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
 import org.jblas.Solve;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 /**
  * 交替最小二乘求解时空约束的压缩感知
  * @author cyl
@@ -86,9 +93,48 @@ public class CSstALS {
             System.out.println();
         }
     }
-    public double getMAPE(DoubleMatrix base, DoubleMatrix estimate){
+    public static double getMAPE(DoubleMatrix base, DoubleMatrix estimate){
         int m = base.rows, n = base.columns;
         return MatrixFunctions.abs(base.sub(estimate)).divi(base.add(DoubleMatrix.ones(m,n).mmul(eps))).sum()/base.length;
+    }
+
+    /**
+     * 去除实际值中没有值得元素
+     * @param base
+     * @param estimate
+     * @return
+     */
+    public static double getMAPEValid(DoubleMatrix base, DoubleMatrix estimate){
+
+        int m = base.rows, n = base.columns;
+        double[][] baseArr = base.toArray2();
+        double[][] estimateArr = estimate.toArray2();
+//
+//        List<List<Integer>> indexs = new ArrayList<>();
+//
+//        for(int i=0;i<m;i++){
+//            indexs.add(new ArrayList<Integer>());
+//            for(int j =0;j<n;j++){
+//                if(baseArr[i][j]>0)
+//                    indexs.get(i).add(j);
+//            }
+//        }
+
+        double acc = 0.0;
+        int counter =0;
+        for(int i=0;i<m;i++){
+            for(int j =0;j<n;j++){
+                if(baseArr[i][j]<0.0) continue;
+                if(baseArr[i][j]==0.0){
+                    counter++;
+                    continue;
+                }
+                acc+=Math.abs((estimateArr[i][j]-baseArr[i][j])/baseArr[i][j]);
+                counter++;
+            }
+        }
+
+        return acc/counter;
     }
 
     public double getRMSE(DoubleMatrix base, DoubleMatrix estimate){
@@ -97,6 +143,14 @@ public class CSstALS {
         return MatrixFunctions.sqrt(MatrixFunctions.pow(base.sub(estimate),2).sum()/base.length);
     }
     public static void main(String[] args) {
+
+        DoubleMatrix base = new DoubleMatrix(new double[][]{{1,2,3},{2,4,4}});
+
+        DoubleMatrix estimate = new DoubleMatrix(new double[][]{{1,3,3},{2,3,4}});
+
+        System.out.println(estimate.toArray2()[0]);
+        System.out.println(CSstALS.getMAPE(base,estimate));
+        System.out.println(CSstALS.getMAPEValid(base,estimate));
 
     }
 }

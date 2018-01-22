@@ -60,6 +60,8 @@ public class DataPicker {
     private static String BEGIN_TIME_STRING = " 00:00:00";
     private static String END_TIME_STRING = " 24:00:00";
 
+    private double[] test_base;
+
 
     DataPicker() {
         /*init segmentIndexAcc*/
@@ -90,6 +92,10 @@ public class DataPicker {
                 flowsCurrIndex = (flowsCurrIndex + 1) % HISTORY_SIZE;
             }
         }
+        //test
+        test_base = flows[HISTORY_SIZE-1];
+        Arrays.fill(flows[HISTORY_SIZE-1],-1);
+
         return;
     }
 
@@ -142,6 +148,17 @@ public class DataPicker {
         }
         fout.close();
     }
+    public void output(double[] flow, FileUtil fout) {
+        int length = flow.length;
+
+        String line = "";
+        for (int i = 0; i < length; i++) {
+            line += String.valueOf(flow[i]);
+            line += "\t";
+            fout.writeLine(line);
+        }
+        fout.close();
+    }
 
 
 
@@ -164,8 +181,12 @@ public class DataPicker {
 
         dp.output(data, new FileUtil(BASE_URL+"estimate.txt"));
 
-        double mape = cSstALS.getMAPE(new DoubleMatrix(M),new DoubleMatrix(data));
-        double rmse = cSstALS.getRMSE(new DoubleMatrix(M),new DoubleMatrix(data));
+        dp.output(dp.test_base, new FileUtil(BASE_URL+"test_base.txt"));
+
+        dp.output(data[HISTORY_SIZE-1], new FileUtil(BASE_URL+"last_row.txt"));
+
+        double mape = cSstALS.getMAPEValid(new DoubleMatrix(dp.test_base),new DoubleMatrix(data[HISTORY_SIZE-1]));
+        double rmse = cSstALS.getRMSE(new DoubleMatrix(dp.test_base),new DoubleMatrix(data[HISTORY_SIZE-1]));
 
         System.out.println("mape is :"+mape);
         System.out.println("rmse is :"+rmse);
