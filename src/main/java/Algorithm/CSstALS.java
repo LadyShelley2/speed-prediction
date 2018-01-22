@@ -1,6 +1,7 @@
 package Algorithm;
 
 import org.jblas.DoubleMatrix;
+import org.jblas.MatrixFunctions;
 import org.jblas.Solve;
 /**
  * 交替最小二乘求解时空约束的压缩感知
@@ -84,6 +85,16 @@ public class CSstALS {
                 System.out.print(a[i][j]+" ");
             System.out.println();
         }
+    }
+    public double getMAPE(DoubleMatrix base, DoubleMatrix estimate){
+        int m = base.rows, n = base.columns;
+        return MatrixFunctions.abs(base.sub(estimate)).divi(base.add(DoubleMatrix.ones(m,n).mmul(eps))).sum()/base.length;
+    }
+
+    public double getRMSE(DoubleMatrix base, DoubleMatrix estimate){
+//        System.out.println(base.sub(estimate));
+        System.out.println(MatrixFunctions.pow(base.sub(estimate),2).sum());
+        return MatrixFunctions.sqrt(MatrixFunctions.pow(base.sub(estimate),2).sum()/base.length);
     }
     public static void main(String[] args) {
 
