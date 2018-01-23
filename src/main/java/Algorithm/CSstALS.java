@@ -109,16 +109,6 @@ public class CSstALS {
         int m = base.rows, n = base.columns;
         double[][] baseArr = base.toArray2();
         double[][] estimateArr = estimate.toArray2();
-//
-//        List<List<Integer>> indexs = new ArrayList<>();
-//
-//        for(int i=0;i<m;i++){
-//            indexs.add(new ArrayList<Integer>());
-//            for(int j =0;j<n;j++){
-//                if(baseArr[i][j]>0)
-//                    indexs.get(i).add(j);
-//            }
-//        }
 
         double acc = 0.0;
         int counter =0;
@@ -151,6 +141,12 @@ public class CSstALS {
         System.out.println(estimate.toArray2()[0]);
         System.out.println(CSstALS.getMAPE(base,estimate));
         System.out.println(CSstALS.getMAPEValid(base,estimate));
+
+        double[][] a = {{1,2,3},{3,4,5}};
+        double[] b = Arrays.copyOf(a[0],a[0].length);
+        a[0][0]=-1;
+
+        System.out.println("______________");
 
     }
 }

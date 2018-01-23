@@ -25,7 +25,6 @@ public class DataPicker {
 //            put("G76", 233);
 //            put("G1501", 67);
 //
-//            //另外两条高速数据异常
 //        }
 //    };
 
@@ -92,8 +91,10 @@ public class DataPicker {
                 flowsCurrIndex = (flowsCurrIndex + 1) % HISTORY_SIZE;
             }
         }
+
+       output(flows, new FileUtil(BASE_URL+"M_init.txt"));
         //test
-        test_base = flows[HISTORY_SIZE-1];
+        test_base = Arrays.copyOf(flows[HISTORY_SIZE-1],flows[0].length);
         Arrays.fill(flows[HISTORY_SIZE-1],-1);
 
         return;
@@ -155,8 +156,8 @@ public class DataPicker {
         for (int i = 0; i < length; i++) {
             line += String.valueOf(flow[i]);
             line += "\t";
-            fout.writeLine(line);
         }
+        fout.writeLine(line);
         fout.close();
     }
 
@@ -180,9 +181,7 @@ public class DataPicker {
         double[][] data = cSstALS.estimate();
 
         dp.output(data, new FileUtil(BASE_URL+"estimate.txt"));
-
         dp.output(dp.test_base, new FileUtil(BASE_URL+"test_base.txt"));
-
         dp.output(data[HISTORY_SIZE-1], new FileUtil(BASE_URL+"last_row.txt"));
 
         double mape = cSstALS.getMAPEValid(new DoubleMatrix(dp.test_base),new DoubleMatrix(data[HISTORY_SIZE-1]));
