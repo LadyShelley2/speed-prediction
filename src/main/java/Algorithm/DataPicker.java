@@ -48,10 +48,10 @@ public class DataPicker {
     private Map<String, Integer> segmentIndexAcc = new HashMap<String, Integer>();/*each road segment index in a row*/
     private int totalCount;
     private DateFormat df;
-    private double[][] flows;
+    public double[][] flows;
     private int flowsCurrIndex = 0;
 
-    private static int HISTORY_SIZE = 4 * 24 * 7;
+    public static int HISTORY_SIZE = 4 * 24 * 7;
     private static int TIMESLOT = 15 * 60;
     private static int BEGIN_DATE = 20161101;
     private static int END_DATE = 20161108;
@@ -59,7 +59,7 @@ public class DataPicker {
     private static String BEGIN_TIME_STRING = " 00:00:00";
     private static String END_TIME_STRING = " 24:00:00";
 
-    private double[] test_base;
+    public double[] test_base;
 
 
     DataPicker() {
@@ -123,7 +123,7 @@ public class DataPicker {
         return segmentIndexAcc.get(roadId).intValue()+Integer.parseInt(segmentId);
     }
 
-    private double[][] genToep(){
+    public double[][] genToep(){
         double[][] Toep = new double[HISTORY_SIZE-1][HISTORY_SIZE];
 
         for(int i=0;i<HISTORY_SIZE-1;++i){
@@ -163,31 +163,5 @@ public class DataPicker {
 
 
 
-    public static void main(String[] args){
-        DataPicker dp = new DataPicker();
-        dp.initFlows();
 
-        double[][] M = dp.flows;
-        double[][] T = dp.genToep();
-
-        dp.output(M, new FileUtil(BASE_URL+"M.txt"));
-
-        Smatrix smatrix = new Smatrix(M);
-        double[][] S = smatrix.calcS();
-
-        dp.output(S, new FileUtil(BASE_URL+"S.txt"));
-
-        CSstALS cSstALS = new CSstALS(new DoubleMatrix(M),new DoubleMatrix(S),new DoubleMatrix(T));
-        double[][] data = cSstALS.estimate();
-
-        dp.output(data, new FileUtil(BASE_URL+"estimate.txt"));
-        dp.output(dp.test_base, new FileUtil(BASE_URL+"test_base.txt"));
-        dp.output(data[HISTORY_SIZE-1], new FileUtil(BASE_URL+"last_row.txt"));
-
-        double mape = cSstALS.getMAPEValid(new DoubleMatrix(dp.test_base),new DoubleMatrix(data[HISTORY_SIZE-1]));
-        double rmse = cSstALS.getRMSE(new DoubleMatrix(dp.test_base),new DoubleMatrix(data[HISTORY_SIZE-1]));
-
-        System.out.println("mape is :"+mape);
-        System.out.println("rmse is :"+rmse);
-    }
 }
